@@ -15,7 +15,7 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
-              D²
+              Devnex
             </h3>
             <p className="text-gray-400 mb-4">
               Innovating the future with AI-powered solutions that transform businesses and solve real-world challenges.
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">© {new Date().getFullYear()} D² Tech Solutions. All rights reserved.</p>
+          <p className="text-gray-400">© {new Date().getFullYear()} Devnex Tech Solutions. All rights reserved.</p>
         </div>
       </div>
     </footer>

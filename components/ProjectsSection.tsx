@@ -1,4 +1,7 @@
+"use client"
+
 import { Home, Users, Heart, Truck, CreditCard } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function ProjectsSection() {
   const projects = [
@@ -6,8 +9,8 @@ export default function ProjectsSection() {
       icon: Home,
       title: "Property Rental Management System",
       description:
-        "A comprehensive web system for managing properties, tracking renter information, and automatically notifying tenants about upcoming rent due dates with integrated payment reminders.",
-      tags: ["Web Development", "Database Management", "Automation"],
+        "A comprehensive web system for managing properties, tracking renter information, notifying tenants about upcoming rent due dates with integrated payment reminders.",
+      tags: ["Web Development", "Database Management"],
     },
     {
       icon: Users,
@@ -39,46 +42,88 @@ export default function ProjectsSection() {
     },
   ]
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  }
+
   return (
     <section id="projects" className="py-20 bg-gray-800/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="text-4xl font-bold text-white mb-4">Our Projects</h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Discover our portfolio of innovative solutions that showcase our expertise in AI, machine learning, and
             intelligent system development.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
           {projects.map((project, index) => (
-            <div
+            <motion.div
               key={index}
-              className="group bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10"
+              variants={itemVariants}
+              className="group relative h-[420px]"
             >
-              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
-                <project.icon className="h-8 w-8 text-white" />
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm -z-10" />
+              <div className="relative h-full p-6 rounded-xl border border-gray-700/50 hover:border-transparent transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
+                <motion.div 
+                  className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <project.icon className="h-7 w-7 text-white" />
+                </motion.div>
+
+                <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                  {project.title}
+                </h3>
+
+                <p className="text-gray-400 leading-relaxed mb-6 flex-grow text-justify">
+                  {project.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mt-auto">
+                  {project.tags.map((tag, tagIndex) => (
+                    <span
+                      key={tagIndex}
+                      className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
-
-              <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                {project.title}
-              </h3>
-
-              <p className="text-gray-400 leading-relaxed mb-4">{project.description}</p>
-
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag, tagIndex) => (
-                  <span
-                    key={tagIndex}
-                    className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

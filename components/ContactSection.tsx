@@ -41,7 +41,7 @@ export default function ContactSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-transparent rounded-xl p-8">
             <h3 className="text-2xl font-semibold text-white mb-6">Send us a message</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -113,7 +113,7 @@ export default function ContactSection() {
 
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-lg">
+                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl">
                   <Mail className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-purple-600 rounded-lg">
+                <div className="flex items-center justify-center w-12 h-12 bg-purple-600 rounded-xl">
                   <Phone className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -133,17 +133,17 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-pink-600 rounded-lg">
+                <div className="flex items-center justify-center w-12 h-12 bg-pink-600 rounded-xl">
                   <Linkedin className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-white">LinkedIn</h4>
-                  <p className="text-gray-400">linkedin.com/company/d2tech</p>
+                  <p className="text-gray-400">d2tech</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-gray-700">
+            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-transparent">
               <h4 className="text-lg font-semibold text-white mb-3">Business Hours</h4>
               <div className="space-y-2 text-gray-400">
                 <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
