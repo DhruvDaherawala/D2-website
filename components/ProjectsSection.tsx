@@ -11,6 +11,7 @@ export default function ProjectsSection() {
       description:
         "A comprehensive web system for managing properties, tracking renter information, notifying tenants about upcoming rent due dates with integrated payment reminders.",
       tags: ["Web Development", "Database Management"],
+      link: "https://new-updated-prms-frontend.vercel.app/"
     },
     {
       icon: Users,
@@ -18,6 +19,7 @@ export default function ProjectsSection() {
       description:
         "An intelligent resume screening tool that leverages natural language processing to scan resumes and shortlist candidates based on skill-role matching and compatibility analysis.",
       tags: ["AI/ML", "NLP", "Recruitment Tech"],
+      link: "https://v0-ai-human-resource.vercel.app/"
     },
     {
       icon: Heart,
@@ -25,13 +27,15 @@ export default function ProjectsSection() {
       description:
         "A machine learning-based health prediction tool that analyzes user input parameters like age, glucose level, BMI, and lifestyle factors to predict diabetes likelihood.",
       tags: ["Healthcare AI", "Predictive Analytics", "ML"],
+      link: "https://selfdoc.onrender.com"
     },
     {
       icon: Truck,
-      title: "CRM for Construction Rentals",
+      title: "CERM for Construction Rentals",
       description:
         "A smart equipment rental management system for construction sites that tracks equipment usage time, generates automated bills, and enables real-time equipment tracking.",
       tags: ["IoT", "Real-time Tracking", "CRM"],
+      link: "https://cerms.vercel.app"
     },
     {
       icon: CreditCard,
@@ -39,6 +43,7 @@ export default function ProjectsSection() {
       description:
         "An AI-powered financial assessment model that analyzes user data including credit history, income, and financial behavior to determine loan eligibility and repayment capability.",
       tags: ["FinTech", "Risk Assessment", "AI"],
+      link: "https://loan-eligibility-prediction-system-zusk.onrender.com"
     },
   ]
 
@@ -88,40 +93,47 @@ export default function ProjectsSection() {
           viewport={{ once: true }}
         >
           {projects.map((project, index) => (
-            <motion.div
+            <a
               key={index}
-              variants={itemVariants}
-              className="group relative h-[420px]"
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm -z-10" />
-              <div className="relative h-full p-6 rounded-xl border border-gray-700/50 hover:border-transparent transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
-                <motion.div 
-                  className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                >
-                  <project.icon className="h-7 w-7 text-white" />
-                </motion.div>
+              <motion.div
+                variants={itemVariants}
+                className="group relative h-[420px]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm -z-10" />
+                <div className="relative h-full p-6 rounded-xl border border-gray-700/50 hover:border-transparent transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
+                  <motion.div 
+                    className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
+                    <project.icon className="h-7 w-7 text-white" />
+                  </motion.div>
 
-                <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                  {project.title}
-                </h3>
+                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                    {project.title}
+                  </h3>
 
-                <p className="text-gray-400 leading-relaxed mb-6 flex-grow text-justify">
-                  {project.description}
-                </p>
+                  <p className="text-gray-400 leading-relaxed mb-6 flex-grow text-justify">
+                    {project.description}
+                  </p>
 
-                <div className="flex flex-wrap gap-2 mt-auto">
-                  {project.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {project.tags.map((tag, tagIndex) => (
+                      <span
+                        key={tagIndex}
+                        className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </a>
           ))}
         </motion.div>
       </div>

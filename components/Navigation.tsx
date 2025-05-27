@@ -51,19 +51,30 @@ export default function Navigation() {
   }, [])
 
   const scrollToSection = (href: string) => {
-    if (href === "#hero") {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      })
-    } else {
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" })
-      }
-    }
+    // First close mobile menu to avoid UI conflicts
     setIsMobileMenuOpen(false)
-    setActiveSection(href)
+    
+    // Small delay to ensure menu closes before scrolling
+    setTimeout(() => {
+      if (href === "#hero") {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        })
+      } else {
+        const element = document.querySelector(href)
+        if (element) {
+          const yOffset = -80; // Adjust this value as needed for proper offset
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+          window.scrollTo({
+            top: y,
+            behavior: "smooth"
+          })
+        }
+      }
+      setActiveSection(href)
+    }, 100)
   }
 
   const scrollToTop = () => {
@@ -83,7 +94,7 @@ export default function Navigation() {
             isScrolled 
               ? "bg-gray-900/80 backdrop-blur-lg shadow-lg border border-gray-800/50" 
               : "bg-gray-900/40 backdrop-blur-md"
-          }`}
+          } relative`}
         >
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -128,8 +139,9 @@ export default function Navigation() {
               {/* Mobile menu button */}
               <div className="md:hidden">
                 <button
+                  aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="text-gray-300 hover:text-white p-2 rounded-md focus:outline-none"
+                  className="text-gray-300 hover:text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   {isMobileMenuOpen ? (
                     <X className="h-6 w-6" />
@@ -148,28 +160,24 @@ export default function Navigation() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="md:hidden bg-gray-900/95 backdrop-blur-lg rounded-b-2xl"
+                className="absolute top-full left-0 right-0 w-full md:hidden bg-gray-900/95 backdrop-blur-lg rounded-b-2xl shadow-lg border border-gray-800/50 mt-2 overflow-hidden z-50"
               >
-                <div className="px-2 pt-2 pb-3 space-y-1">
+                <div className="px-4 pt-3 pb-4 space-y-2">
                   {navItems.map((item) => (
-                    <motion.a
+                    <motion.button
                       key={item.name}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      href={item.href}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        scrollToSection(item.href)
-                      }}
-                      className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors duration-200 ${
+                      onClick={() => scrollToSection(item.href)}
+                      className={`block w-full text-left px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
                         activeSection === item.href
-                          ? "text-white bg-gray-800/50"
-                          : "text-gray-300 hover:text-white hover:bg-gray-800/30"
+                          ? "text-white bg-gray-800/70"
+                          : "text-gray-300 hover:text-white hover:bg-gray-800/50 active:bg-gray-700/70"
                       }`}
                     >
                       {item.name}
-                    </motion.a>
+                    </motion.button>
                   ))}
                 </div>
               </motion.div>
