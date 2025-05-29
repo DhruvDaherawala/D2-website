@@ -19,6 +19,14 @@ export default function Navigation() {
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
+    // Prevent scroll restoration on page refresh
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    
+    // Ensure page starts at top on refresh
+    window.scrollTo(0, 0)
+
     const handleScroll = () => {
       const scrollPosition = window.scrollY
       setIsScrolled(scrollPosition > 20)
@@ -126,7 +134,7 @@ export default function Navigation() {
                       }}
                       className={`px-3 py-2 text-sm font-medium transition-all duration-200 relative ${
                         activeSection === item.href
-                          ? "text-white"
+                          ? "text-purple-400"
                           : "text-gray-300 hover:text-white"
                       }`}
                     >
@@ -172,7 +180,7 @@ export default function Navigation() {
                       onClick={() => scrollToSection(item.href)}
                       className={`block w-full text-left px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
                         activeSection === item.href
-                          ? "text-white bg-gray-800/70"
+                          ? "text-purple-400 bg-gray-800/70"
                           : "text-gray-300 hover:text-white hover:bg-gray-800/50 active:bg-gray-700/70"
                       }`}
                     >
