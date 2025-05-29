@@ -1,0 +1,34 @@
+[
+  {
+    "id": "31d6a57c-f19b-4001-8ae5-fa43688db113",
+    "icon": "Brain",
+    "title": "AI/ML Solutions",
+    "description": "Advanced machine learning models and AI systems that deliver intelligent insights for your business.",
+    "gradient": "from-blue-600 to-purple-600",
+    "hoverGradient": "from-blue-700 to-purple-700"
+  },
+  {
+    "id": "377f068f-e861-4021-8407-133983e7082e",
+    "icon": "Code",
+    "title": "Software Development",
+    "description": "Custom software solutions built with modern technologies and scalable architecture for optimal performance.",
+    "gradient": "from-purple-600 to-pink-600",
+    "hoverGradient": "from-purple-700 to-pink-700"
+  },
+  {
+    "id": "870785f5-8950-4a93-b1e0-4bf794a1a7af",
+    "icon": "Cog",
+    "title": "Smart Systems & Automation",
+    "description": "Intelligent automation systems that streamline processes and increase operational efficiency.",
+    "gradient": "from-pink-600 to-red-600",
+    "hoverGradient": "from-pink-700 to-red-700"
+  },
+  {
+    "id": "6263b370-a732-4563-86fe-97ef5502b429",
+    "icon": "Database",
+    "title": "Data-Driven Applications",
+    "description": "Powerful applications that leverage data analytics to drive informed decision-making.",
+    "gradient": "from-red-600 to-orange-600",
+    "hoverGradient": "from-red-700 to-orange-700"
+  }
+]

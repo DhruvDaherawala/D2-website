@@ -1,0 +1,52 @@
+[
+  {
+    "id": "0c776373-ebc4-4029-8394-f871cd84450f",
+    "title": "About Us",
+    "subtitle": "Driving innovation through technology",
+    "description": "We are a team of passionate developers, designers, and technologists dedicated to creating exceptional digital experiences. With expertise across various domains, we tackle complex challenges and deliver solutions that exceed expectations.",
+    "stats": [
+      {
+        "id": "5083ede9-8fd9-4324-b090-ec06b2367767",
+        "value": "50+",
+        "label": "Projects Completed"
+      },
+      {
+        "id": "9e8fad7e-5742-4948-85a3-55fa1a186712",
+        "value": "10+",
+        "label": "Years Experience"
+      },
+      {
+        "id": "4817959b-b6c5-42c9-82bb-50dae43e8380",
+        "value": "30+",
+        "label": "Happy Clients"
+      },
+      {
+        "id": "54f1022a-102f-4d60-82f4-bed89ce0b41d",
+        "value": "99%",
+        "label": "Client Satisfaction"
+      }
+    ],
+    "features": [
+      {
+        "id": "9aadd75f-a854-4f59-9cba-0a37c3d561c8",
+        "title": "Modern Tech Stack",
+        "description": "We use the latest technologies and frameworks to build robust and scalable applications."
+      },
+      {
+        "id": "9b810491-4544-406f-89a6-556479a2378c",
+        "title": "User-Centric Design",
+        "description": "Our solutions are designed with the end-user in mind, ensuring intuitive and engaging experiences."
+      },
+      {
+        "id": "f466d068-8be0-49b4-a293-706d6f0b62f8",
+        "title": "Agile Methodology",
+        "description": "We follow agile practices to deliver value quickly and adapt to changing requirements."
+      },
+      {
+        "id": "faaef29c-b551-4695-9078-daf9b8fce314",
+        "title": "Continuous Support",
+        "description": "Our commitment doesn't end at deployment; we provide ongoing support and maintenance."
+      }
+    ]
+  }
+]

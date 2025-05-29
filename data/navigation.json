@@ -1,0 +1,27 @@
+[
+  {
+    "id": "069632ba-22d6-4907-ab19-4c088a0e6c36",
+    "title": "Home",
+    "href": "#home"
+  },
+  {
+    "id": "f1cf3416-6870-4185-9d8d-ffebe0e38512",
+    "title": "Services",
+    "href": "#services"
+  },
+  {
+    "id": "8b8f37e9-9b6f-4a16-8fc1-c2adc392fae0",
+    "title": "About",
+    "href": "#about"
+  },
+  {
+    "id": "a59238f6-b0f0-4717-a0b4-bbc39a32f59f",
+    "title": "Projects",
+    "href": "#projects"
+  },
+  {
+    "id": "95b7950b-0e70-4210-9a78-35e0e4ec34f7",
+    "title": "Contact",
+    "href": "#contact"
+  }
+]

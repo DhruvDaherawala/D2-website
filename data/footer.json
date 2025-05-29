@@ -1,0 +1,28 @@
+[
+  {
+    "id": "1b26edff-9b34-449f-a17a-f27884376ce5",
+    "companyName": "Devnex",
+    "description": "Building innovative software solutions for the modern world.",
+    "socialLinks": [
+      {
+        "id": "0283da47-62ec-4296-907a-8eba9e5665ed",
+        "platform": "Twitter",
+        "url": "https://twitter.com",
+        "icon": "Twitter"
+      },
+      {
+        "id": "fb990831-cdc1-45e0-8a87-49b9c9299766",
+        "platform": "GitHub",
+        "url": "https://github.com",
+        "icon": "Github"
+      },
+      {
+        "id": "74e8edd3-a8ad-482c-b056-dd24424d8b65",
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com",
+        "icon": "Linkedin"
+      }
+    ],
+    "copyright": "© 2023 Devnex. All rights reserved."
+  }
+]

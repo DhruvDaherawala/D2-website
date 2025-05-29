@@ -1,0 +1,54 @@
+[
+  {
+    "id": "6f1e75ad-c5e5-4b36-a721-0ef395bbcc4e",
+    "title": "AI-Powered Analytics Platform",
+    "description": "A comprehensive analytics platform leveraging machine learning to provide actionable insights from complex data sets.",
+    "imageUrl": "/images/project1.jpg",
+    "tags": [
+      "AI",
+      "Machine Learning",
+      "Data Analytics"
+    ],
+    "demoLink": "https://example.com",
+    "githubLink": "https://github.com/example"
+  },
+  {
+    "id": "fa133b84-deaf-46cb-a0d0-a8ab183064c2",
+    "title": "E-Commerce Mobile App",
+    "description": "A feature-rich mobile application for a leading e-commerce brand, enhancing user experience and driving sales.",
+    "imageUrl": "/images/project2.jpg",
+    "tags": [
+      "React Native",
+      "Redux",
+      "Node.js"
+    ],
+    "demoLink": "https://example.com",
+    "githubLink": "https://github.com/example"
+  },
+  {
+    "id": "a6d1299e-3a45-46d0-ad48-264d5c478d51",
+    "title": "Smart Home Automation System",
+    "description": "An IoT-based system for comprehensive home automation, offering seamless control over various smart devices.",
+    "imageUrl": "/images/project3.jpg",
+    "tags": [
+      "IoT",
+      "Embedded Systems",
+      "Cloud"
+    ],
+    "demoLink": "https://example.com",
+    "githubLink": "https://github.com/example"
+  },
+  {
+    "id": "9d482668-f241-4f9b-97cc-870ae9b9f7d3",
+    "title": "Enterprise Resource Planning Solution",
+    "description": "A scalable ERP solution tailored for medium to large businesses, streamlining operations and improving efficiency.",
+    "imageUrl": "/images/project4.jpg",
+    "tags": [
+      "SaaS",
+      "Cloud Architecture",
+      "Enterprise"
+    ],
+    "demoLink": "https://example.com",
+    "githubLink": "https://github.com/example"
+  }
+]
