@@ -25,6 +25,12 @@ export async function initDb() {
   console.log('Database initialized successfully!');
 }
 
+export async function initializeProjectsDatabase() {
+  console.log('Initializing projects database...');
+  await initializeDatabase('projects', projects);
+  console.log('Projects database initialized successfully!');
+}
+
 // Optional: Run directly if this file is executed
 if (require.main === module) {
   initDb()
