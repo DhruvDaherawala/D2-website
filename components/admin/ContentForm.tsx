@@ -8,31 +8,45 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+
+interface SelectOption {
+  label: string;
+  value: string;
+}
 
 interface ContentFormProps {
   title: string;
   fields: FormField[];
   initialData?: any;
   collection: string;
-  onSuccess?: () => void;
+  onSuccess?: (data?: any) => void;
   submitLabel?: string;
   cancelLabel?: string;
   onCancel?: () => void;
+  transformData?: (data: any) => any;
 }
 
 interface FormField {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "email" | "url" | "color";
+  type: "text" | "textarea" | "number" | "email" | "url" | "color" | "select";
   placeholder?: string;
   description?: string;
   required?: boolean;
   min?: number;
   max?: number;
+  options?: SelectOption[];
 }
 
 export default function ContentForm({
@@ -44,6 +58,7 @@ export default function ContentForm({
   submitLabel = "Save",
   cancelLabel = "Cancel",
   onCancel,
+  transformData,
 }: ContentFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,29 +66,17 @@ export default function ContentForm({
   // Dynamically build schema based on fields
   const schemaFields: Record<string, any> = {};
   fields.forEach((field) => {
-    let schema = z.string();
+    let schema: any;
     
-    if (field.required) {
-      schema = schema.min(1, `${field.label} is required`);
-    } else {
-      schema = schema.optional();
-    }
-
     if (field.type === "email") {
-      schema = z.string().email(`Invalid email address`).optional();
-      if (field.required) {
-        schema = z.string().email(`Invalid email address`);
-      }
-    }
-
-    if (field.type === "url") {
-      schema = z.string().url(`Invalid URL`).optional();
-      if (field.required) {
-        schema = z.string().url(`Invalid URL`);
-      }
-    }
-
-    if (field.type === "number") {
+      schema = field.required
+        ? z.string().min(1, `${field.label} is required`).email(`Invalid email address`)
+        : z.string().email(`Invalid email address`).optional();
+    } else if (field.type === "url") {
+      schema = field.required
+        ? z.string().min(1, `${field.label} is required`).url(`Invalid URL`)
+        : z.string().url(`Invalid URL`).optional();
+    } else if (field.type === "number") {
       schema = z.coerce.number();
       if (field.min !== undefined) {
         schema = schema.min(field.min, `Minimum value is ${field.min}`);
@@ -84,6 +87,16 @@ export default function ContentForm({
       if (!field.required) {
         schema = schema.optional();
       }
+    } else if (field.type === "select") {
+      // Handle select fields
+      schema = field.required
+        ? z.string().min(1, `${field.label} is required`)
+        : z.string().optional();
+    } else {
+      // Text, textarea, color types
+      schema = field.required
+        ? z.string().min(1, `${field.label} is required`)
+        : z.string().optional();
     }
 
     schemaFields[field.name] = schema;
@@ -100,9 +113,12 @@ export default function ContentForm({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
+      // Apply data transformation if provided
+      const processedData = transformData ? transformData(data) : data;
+      
       const url = initialData?.id
-        ? `/api/content/${collection}?id=${initialData.id}`
-        : `/api/content/${collection}`;
+        ? `/api/${collection}?id=${initialData.id}`
+        : `/api/${collection}`;
       
       const method = initialData?.id ? "PUT" : "POST";
       
@@ -112,7 +128,7 @@ export default function ContentForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          ...data,
+          ...processedData,
           id: initialData?.id
         }),
       });
@@ -122,13 +138,15 @@ export default function ContentForm({
         throw new Error(error.error || "Something went wrong");
       }
 
+      const result = await response.json();
+      
       toast.success(`${title} saved successfully!`);
       
       // Refresh server data
       router.refresh();
       
       if (onSuccess) {
-        onSuccess();
+        onSuccess(result);
       }
     } catch (error) {
       toast.error(`Error: ${error instanceof Error ? error.message : "Something went wrong"}`);
@@ -160,6 +178,22 @@ export default function ContentForm({
                           {...formField}
                           className="bg-gray-900 border-gray-700"
                         />
+                      ) : field.type === "select" && field.options ? (
+                        <Select
+                          onValueChange={formField.onChange}
+                          defaultValue={formField.value}
+                        >
+                          <SelectTrigger className="bg-gray-900 border-gray-700">
+                            <SelectValue placeholder={field.placeholder} />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-900 border-gray-700">
+                            {field.options.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : (
                         <Input
                           type={field.type}

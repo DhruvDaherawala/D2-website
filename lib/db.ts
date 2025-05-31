@@ -1,87 +1,160 @@
-import fs from "fs";
-import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { connectToDatabase, DB_NAME } from "./mongodb";
+import { ObjectId } from "mongodb";
 
-const DB_DIR = path.join(process.cwd(), "data");
-
-// Ensure the data directory exists
-if (!fs.existsSync(DB_DIR)) {
-  fs.mkdirSync(DB_DIR, { recursive: true });
-}
-
-// Generic function to read a collection
-export async function readCollection<T>(collection: string): Promise<T[]> {
-  const filePath = path.join(DB_DIR, `${collection}.json`);
-  
-  if (!fs.existsSync(filePath)) {
-    return [];
+// Helper function to convert MongoDB _id to standard id
+const convertId = (item: any) => {
+  if (item && item._id) {
+    item.id = item._id.toString();
+    delete item._id;
   }
-  
-  const data = await fs.promises.readFile(filePath, "utf8");
-  return JSON.parse(data) as T[];
-}
+  return item;
+};
 
-// Generic function to write a collection
-export async function writeCollection<T>(collection: string, data: T[]): Promise<void> {
-  const filePath = path.join(DB_DIR, `${collection}.json`);
-  await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
-}
+// Helper function to prepare item for MongoDB
+const prepareForMongo = (item: any) => {
+  const result = { ...item };
+  if (result.id) {
+    delete result.id;
+  }
+  return result;
+};
 
 // Generic CRUD operations
 export async function getAll<T>(collection: string): Promise<T[]> {
-  return readCollection<T>(collection);
+  try {
+    const { db } = await connectToDatabase();
+    const result = await db.collection(collection).find({}).toArray();
+    return result.map(convertId) as T[];
+  } catch (error) {
+    console.error(`Error getting all items from ${collection}:`, error);
+    return [];
+  }
 }
 
 export async function getById<T extends { id: string }>(collection: string, id: string): Promise<T | null> {
-  const items = await readCollection<T>(collection);
-  return items.find(item => item.id === id) || null;
+  try {
+    const { db } = await connectToDatabase();
+    let query = {};
+    
+    try {
+      // Try to use ObjectId if it looks like a MongoDB ObjectId
+      if (/^[0-9a-fA-F]{24}$/.test(id)) {
+        query = { _id: new ObjectId(id) };
+      } else {
+        query = { id: id };
+      }
+    } catch (e) {
+      query = { id: id };
+    }
+    
+    const result = await db.collection(collection).findOne(query);
+    return result ? convertId(result) as T : null;
+  } catch (error) {
+    console.error(`Error getting item by ID from ${collection}:`, error);
+    return null;
+  }
 }
 
 export async function create<T extends { id?: string }>(collection: string, data: T): Promise<T> {
-  const items = await readCollection<T>(collection);
-  const newItem = { ...data, id: data.id || uuidv4() };
-  items.push(newItem as T);
-  await writeCollection(collection, items);
-  return newItem as T;
+  try {
+    const { db } = await connectToDatabase();
+    const item = { ...data };
+    
+    // Ensure we have an ID
+    if (!item.id) {
+      item.id = uuidv4();
+    }
+    
+    const mongoItem = prepareForMongo(item);
+    const result = await db.collection(collection).insertOne(mongoItem);
+    
+    return { ...item, _id: result.insertedId } as unknown as T;
+  } catch (error) {
+    console.error(`Error creating item in ${collection}:`, error);
+    throw error;
+  }
 }
 
 export async function update<T extends { id: string }>(collection: string, id: string, data: Partial<T>): Promise<T | null> {
-  const items = await readCollection<T>(collection);
-  const index = items.findIndex(item => item.id === id);
-  
-  if (index === -1) {
+  try {
+    const { db } = await connectToDatabase();
+    let query = {};
+    
+    try {
+      // Try to use ObjectId if it looks like a MongoDB ObjectId
+      if (/^[0-9a-fA-F]{24}$/.test(id)) {
+        query = { _id: new ObjectId(id) };
+      } else {
+        query = { id: id };
+      }
+    } catch (e) {
+      query = { id: id };
+    }
+    
+    const updateData = prepareForMongo(data);
+    const result = await db.collection(collection).findOneAndUpdate(
+      query,
+      { $set: updateData },
+      { returnDocument: "after" }
+    );
+    
+    return result ? convertId(result) as T : null;
+  } catch (error) {
+    console.error(`Error updating item in ${collection}:`, error);
     return null;
   }
-  
-  const updatedItem = { ...items[index], ...data, id };
-  items[index] = updatedItem;
-  await writeCollection(collection, items);
-  return updatedItem;
 }
 
 export async function remove<T extends { id: string }>(collection: string, id: string): Promise<boolean> {
-  const items = await readCollection<T>(collection);
-  const filteredItems = items.filter(item => item.id !== id);
-  
-  if (filteredItems.length === items.length) {
+  try {
+    const { db } = await connectToDatabase();
+    let query = {};
+    
+    try {
+      // Try to use ObjectId if it looks like a MongoDB ObjectId
+      if (/^[0-9a-fA-F]{24}$/.test(id)) {
+        query = { _id: new ObjectId(id) };
+      } else {
+        query = { id: id };
+      }
+    } catch (e) {
+      query = { id: id };
+    }
+    
+    const result = await db.collection(collection).deleteOne(query);
+    return result.deletedCount > 0;
+  } catch (error) {
+    console.error(`Error removing item from ${collection}:`, error);
     return false;
   }
-  
-  await writeCollection(collection, filteredItems);
-  return true;
 }
 
 // Utility function to initialize the database with default data
 export async function initializeDatabase<T>(collection: string, defaultData: T[]): Promise<void> {
-  const filePath = path.join(DB_DIR, `${collection}.json`);
-  
-  if (!fs.existsSync(filePath)) {
-    await writeCollection(collection, defaultData);
+  try {
+    const { db } = await connectToDatabase();
+    
+    // Check if collection has any documents
+    const count = await db.collection(collection).countDocuments();
+    
+    if (count === 0) {
+      // Collection is empty, insert default data
+      const mongoItems = defaultData.map(item => prepareForMongo(item));
+      await db.collection(collection).insertMany(mongoItems);
+      console.log(`Initialized ${collection} collection with default data`);
+    }
+  } catch (error) {
+    console.error(`Error initializing ${collection} collection:`, error);
+    throw error;
   }
 }
 
 // Handle file uploads
 export async function saveUploadedFile(file: File): Promise<string> {
+  // Keep file upload functionality the same as it involves file system operations
+  const fs = require('fs');
+  const path = require('path');
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   
   if (!fs.existsSync(uploadsDir)) {

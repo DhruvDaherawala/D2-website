@@ -1,24 +1,25 @@
 export interface NavLink {
   id: string;
   title: string;
-  href: string;
+  url: string;
 }
 
 export interface HeroContent {
   id: string;
   title: string;
   subtitle: string;
-  buttonText: string;
-  buttonLink: string;
+  cta: string;
+  ctaUrl: string;
+  secondaryCta?: string;
+  secondaryCtaUrl?: string;
+  backgroundImage?: string;
 }
 
 export interface Service {
   id: string;
-  icon: string;
   title: string;
   description: string;
-  gradient: string;
-  hoverGradient: string;
+  icon: string;
 }
 
 export interface AboutContent {
@@ -27,25 +28,19 @@ export interface AboutContent {
   subtitle: string;
   description: string;
   stats: {
-    id: string;
-    value: string;
-    label: string;
-  }[];
-  features: {
-    id: string;
     title: string;
-    description: string;
+    value: string;
   }[];
+  image?: string;
 }
 
 export interface Project {
-  id: string;
+  id?: string;
   title: string;
   description: string;
-  imageUrl: string;
+  iconName: string; // Name of the icon to use
   tags: string[];
-  demoLink?: string;
-  githubLink?: string;
+  link: string;
 }
 
 export interface ContactContent {
@@ -55,19 +50,17 @@ export interface ContactContent {
   email: string;
   phone: string;
   address: string;
+  mapUrl?: string;
 }
 
 export interface FooterContent {
   id: string;
-  companyName: string;
-  description: string;
+  copyright: string;
   socialLinks: {
-    id: string;
     platform: string;
     url: string;
     icon: string;
   }[];
-  copyright: string;
 }
 
 export interface SiteConfig {
@@ -75,6 +68,21 @@ export interface SiteConfig {
   siteName: string;
   siteDescription: string;
   siteUrl: string;
-  favicon: string;
-  logo: string;
+  favicon?: string;
+  ogImage?: string;
+  themeColor?: string;
+  colorScheme?: string;
+}
+
+export interface UserInquiry {
+  id?: string;
+  name?: string;
+  email?: string;
+  message?: string;
+  phone?: string;
+  subject?: string;
+  company?: string;
+  projectInterest?: string;
+  createdAt: Date;
+  [key: string]: any; // Allow for dynamic fields
 } 

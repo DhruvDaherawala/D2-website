@@ -1,51 +1,84 @@
 "use client"
 
-import { Home, Users, Heart, Truck, CreditCard } from "lucide-react"
+import { Home, Users, Heart, Truck, CreditCard, LucideIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { Project } from "@/lib/types"
 
-export default function ProjectsSection() {
-  const projects = [
-    {
-      icon: Home,
-      title: "Property Rental Management System",
-      description:
-        "A comprehensive web system for managing properties, tracking renter information, notifying tenants about upcoming rent due dates with integrated payment reminders.",
-      tags: ["Web Development", "Database Management"],
-      link: "https://new-updated-prms-frontend.vercel.app/"
-    },
-    {
-      icon: Users,
-      title: "AI-Recruitment System",
-      description:
-        "An intelligent resume screening tool that leverages natural language processing to scan resumes and shortlist candidates based on skill-role matching and compatibility analysis.",
-      tags: ["AI/ML", "NLP", "Recruitment Tech"],
-      link: "https://v0-ai-human-resource.vercel.app/"
-    },
-    {
-      icon: Heart,
-      title: "SelfDoc",
-      description:
-        "A machine learning-based health prediction tool that analyzes user input parameters like age, glucose level, BMI, and lifestyle factors to predict diabetes likelihood.",
-      tags: ["Healthcare AI", "Predictive Analytics", "ML"],
-      link: "https://selfdoc.onrender.com"
-    },
-    {
-      icon: Truck,
-      title: "CERM for Construction Rentals",
-      description:
-        "A smart equipment rental management system for construction sites that tracks equipment usage time, generates automated bills, and enables real-time equipment tracking.",
-      tags: ["IoT", "Real-time Tracking", "CRM"],
-      link: "https://cerms.vercel.app"
-    },
-    {
-      icon: CreditCard,
-      title: "Loan Eligibility System",
-      description:
-        "An AI-powered financial assessment model that analyzes user data including credit history, income, and financial behavior to determine loan eligibility and repayment capability.",
-      tags: ["FinTech", "Risk Assessment", "AI"],
-      link: "https://loan-eligibility-prediction-system-zusk.onrender.com"
-    },
-  ]
+// Map of icon names to their components
+const iconMap: Record<string, LucideIcon> = {
+  Home,
+  Users, 
+  Heart,
+  Truck,
+  CreditCard
+};
+
+interface ProjectsSectionProps {
+  projects?: Project[];
+}
+
+export default function ProjectsSection({ projects: initialProjects }: ProjectsSectionProps) {
+  const [projects, setProjects] = useState<(Project & { icon?: LucideIcon })[]>([]);
+  const [loading, setLoading] = useState(!initialProjects);
+  
+  // Helper to map icon names to components
+  const mapProjectsWithIcons = (projectsData: Project[]) => {
+    return projectsData.map(project => {
+      // Ensure project has valid tags array
+      const tags = Array.isArray(project.tags) ? project.tags : [];
+      
+      return {
+        ...project,
+        tags: tags, // Ensure tags is always an array
+        icon: iconMap[project.iconName] || Home, // Default to Home if icon not found
+      };
+    });
+  };
+  
+  useEffect(() => {
+    if (initialProjects && initialProjects.length > 0) {
+      // If we have server-side props, use those
+      setProjects(mapProjectsWithIcons(initialProjects));
+      setLoading(false);
+    } else {
+      // Otherwise, fetch from API
+      async function fetchProjects() {
+        try {
+          const response = await fetch('/api/projects');
+          if (!response.ok) {
+            throw new Error('Failed to fetch projects');
+          }
+          
+          const data = await response.json();
+          // Map the string icon names back to components
+          const projectsWithIcons = mapProjectsWithIcons(data);
+          
+          setProjects(projectsWithIcons);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+          // Fallback to hard-coded projects for development
+          const fallbackProjects = [
+            {
+              icon: Home,
+              iconName: "Home",
+              title: "Property Rental Management System",
+              description:
+                "A comprehensive web system for managing properties, tracking renter information, notifying tenants about upcoming rent due dates with integrated payment reminders.",
+              tags: ["Web Development", "Database Management"],
+              link: "https://new-updated-prms-frontend.vercel.app/"
+            },
+            // Add other fallback projects here if needed
+          ];
+          setProjects(fallbackProjects as (Project & { icon: LucideIcon })[]);
+        } finally {
+          setLoading(false);
+        }
+      }
+      
+      fetchProjects();
+    }
+  }, [initialProjects]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -85,57 +118,63 @@ export default function ProjectsSection() {
           </p>
         </motion.div>
 
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {projects.map((project, index) => (
-            <a
-              key={index}
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
-            >
-              <motion.div
-                variants={itemVariants}
-                className="group relative h-[420px]"
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {projects.map((project, index) => (
+              <a
+                key={index}
+                href={project.link || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none' }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm -z-10" />
-                <div className="relative h-full p-6 rounded-xl border border-gray-700/50 hover:border-transparent transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
-                  <motion.div 
-                    className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                    <project.icon className="h-7 w-7 text-white" />
-                  </motion.div>
+                <motion.div
+                  variants={itemVariants}
+                  className="group relative h-[420px]"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm -z-10" />
+                  <div className="relative h-full p-6 rounded-xl border border-gray-700/50 hover:border-transparent transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
+                    <motion.div 
+                      className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6 group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                    >
+                      {project.icon && <project.icon className="h-7 w-7 text-white" />}
+                    </motion.div>
 
-                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                    {project.title}
-                  </h3>
+                    <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                      {project.title}
+                    </h3>
 
-                  <p className="text-gray-400 leading-relaxed mb-6 flex-grow text-justify">
-                    {project.description}
-                  </p>
+                    <p className="text-gray-400 leading-relaxed mb-6 flex-grow text-justify">
+                      {project.description}
+                    </p>
 
-                  <div className="flex flex-wrap gap-2 mt-auto">
-                    {project.tags.map((tag, tagIndex) => (
-                      <span
-                        key={tagIndex}
-                        className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                      {Array.isArray(project.tags) && project.tags.map((tag, tagIndex) => (
+                        <span
+                          key={tagIndex}
+                          className="px-3 py-1 bg-blue-600/20 text-blue-300 text-sm rounded-full border border-blue-600/30"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            </a>
-          ))}
-        </motion.div>
+                </motion.div>
+              </a>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   )

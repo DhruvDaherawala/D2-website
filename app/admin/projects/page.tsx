@@ -40,15 +40,16 @@ import {
 import { toast } from "sonner";
 import ContentForm from "@/components/admin/ContentForm";
 import FileUpload from "@/components/admin/FileUpload";
-import { Pencil, Plus, Trash2, Image, ExternalLink, Github } from "lucide-react";
+import { Pencil, Plus, Trash2, Image, ExternalLink, Github, PlusCircle, Eye } from "lucide-react";
 import { Project } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
-export default function ProjectsPage() {
+export default function AdminProjectsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [showEditProjectForm, setShowEditProjectForm] = useState(false);
@@ -66,25 +67,25 @@ export default function ProjectsPage() {
 
   // Fetch projects data
   useEffect(() => {
-    async function fetchProjects() {
-      try {
-        const response = await fetch("/api/content/projects");
-        if (response.ok) {
-          const data = await response.json();
-          setProjects(data);
-        } else {
-          toast.error("Failed to fetch projects");
-        }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        toast.error("An error occurred while fetching projects");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchProjects();
   }, []);
+
+  async function fetchProjects() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/projects");
+      if (!response.ok) {
+        throw new Error("Failed to fetch projects");
+      }
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      toast.error("Error loading projects");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleEditProject = (project: Project) => {
     setEditingProject(project);
@@ -95,7 +96,7 @@ export default function ProjectsPage() {
     if (!projectToDelete) return;
 
     try {
-      const response = await fetch(`/api/content/projects?id=${projectToDelete.id}`, {
+      const response = await fetch(`/api/admin/projects?id=${projectToDelete.id}`, {
         method: "DELETE",
       });
 
@@ -103,6 +104,7 @@ export default function ProjectsPage() {
         setProjects(projects.filter(p => p.id !== projectToDelete.id));
         toast.success("Project deleted successfully");
         setProjectToDelete(null);
+        fetchProjects();
       } else {
         const error = await response.json();
         throw new Error(error.error || "Failed to delete project");
@@ -222,217 +224,129 @@ export default function ProjectsPage() {
         tags: data.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean)
       };
     }
+    
+    // Ensure tags is always an array
+    if (!Array.isArray(data.tags)) {
+      return {
+        ...data,
+        tags: []
+      };
+    }
+    
     return data;
   };
 
   // Format tags to string for editing
   const formatProjectForEdit = (project: Project) => {
+    // Ensure tags is an array before joining
+    const tags = Array.isArray(project.tags) 
+      ? project.tags.join(', ')
+      : typeof project.tags === 'string' 
+        ? project.tags
+        : '';
+        
     return {
       ...project,
-      tags: project.tags.join(', ')
+      tags: tags
     };
   };
 
   return (
-    <div className="container mx-auto px-4 py-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">Projects</h1>
-        <div className="space-x-2">
-          <Dialog open={showImageUpload} onOpenChange={setShowImageUpload}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Image className="mr-2 h-4 w-4" /> Upload Image
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] bg-gray-800 border-gray-700">
-              <DialogHeader>
-                <DialogTitle className="text-white">Upload Project Image</DialogTitle>
-              </DialogHeader>
-              <FileUpload 
-                onUploadComplete={handleUploadComplete}
-                accept="image/*"
-              />
-            </DialogContent>
-          </Dialog>
-          
-          <Dialog open={showNewProjectForm} onOpenChange={setShowNewProjectForm}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setCurrentImageUploadTarget("new")}>
-                <Plus className="mr-2 h-4 w-4" /> Add Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] bg-gray-800 border-gray-700">
-              <DialogHeader>
-                <DialogTitle className="text-white">Add New Project</DialogTitle>
-              </DialogHeader>
-              <ContentForm
-                title="New Project"
-                fields={projectFields}
-                collection="projects"
-                onSuccess={(data) => handleNewProjectSuccess()}
-                onCancel={() => setShowNewProjectForm(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-white">Projects Management</h1>
+        <Button onClick={() => router.push("/admin/projects/new")}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Add New Project
+        </Button>
       </div>
 
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Manage Projects</CardTitle>
-          <CardDescription>
-            Edit, add, or remove projects displayed on your website
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="text-center py-4">Loading projects...</div>
-          ) : projects.length === 0 ? (
-            <div className="text-center py-4 text-gray-400">
-              No projects found. Create your first project by clicking "Add Project".
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Image</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead className="hidden md:table-cell">Tags</TableHead>
-                  <TableHead className="hidden md:table-cell">Links</TableHead>
-                  <TableHead className="w-28 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {projects.map((project) => (
-                  <TableRow key={project.id}>
-                    <TableCell>
-                      <div className="relative w-10 h-10 rounded overflow-hidden">
-                        <img
-                          src={project.imageUrl || "/placeholder-image.jpg"}
-                          alt={project.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/placeholder-image.jpg";
-                          }}
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{project.title}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {project.tags.slice(0, 3).map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {project.tags.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{project.tags.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div className="flex space-x-2">
-                        {project.demoLink && (
-                          <a 
-                            href={project.demoLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        )}
-                        {project.githubLink && (
-                          <a 
-                            href={project.githubLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300"
-                          >
-                            <Github className="h-4 w-4" />
-                          </a>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            setEditingProject(project);
-                            setCurrentImageUploadTarget("edit");
-                            setShowImageUpload(true);
-                          }}
-                        >
-                          <Image className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleEditProject(project)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => setProjectToDelete(project)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <Card key={project.id} className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white flex justify-between items-start">
+                  <span className="truncate">{project.title}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4 h-24 overflow-hidden text-ellipsis">
+                  {project.description}
+                </p>
 
-      {/* Edit Project Dialog */}
-      <Dialog open={showEditProjectForm} onOpenChange={setShowEditProjectForm}>
-        <DialogContent className="sm:max-w-[600px] bg-gray-800 border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-white">Edit Project</DialogTitle>
-          </DialogHeader>
-          {editingProject && (
-            <ContentForm
-              title="Edit Project"
-              fields={projectFields}
-              initialData={formatProjectForEdit(editingProject)}
-              collection="projects"
-              onSuccess={handleEditProjectSuccess}
-              onCancel={() => {
-                setShowEditProjectForm(false);
-                setEditingProject(null);
-              }}
-            />
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {Array.isArray(project.tags) ? project.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded"
+                    >
+                      {tag}
+                    </span>
+                  )) : (
+                    <span className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded">
+                      {typeof project.tags === 'string' ? project.tags : 'No tags'}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex space-x-2 mt-4 justify-end">
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href={project.link || "#"} target="_blank">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => router.push(`/admin/projects/${project.id}`)}
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setProjectToDelete(project)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {projects.length === 0 && (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              No projects found. Add your first project!
+            </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog 
-        open={!!projectToDelete} 
-        onOpenChange={(open) => !open && setProjectToDelete(null)}
-      >
+      <AlertDialog open={!!projectToDelete} onOpenChange={open => !open && setProjectToDelete(null)}>
         <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the project "{projectToDelete?.title}".
-              This action cannot be undone.
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone. This will permanently delete the project
+              {projectToDelete?.title && <span className="font-medium"> "{projectToDelete.title}"</span>}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+            <AlertDialogCancel className="bg-gray-700 text-white hover:bg-gray-600">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
               onClick={handleDeleteProject}
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               Delete
             </AlertDialogAction>
