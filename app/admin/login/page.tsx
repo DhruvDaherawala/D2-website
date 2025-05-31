@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function LoginPage() {
+// Loading fallback component
+function LoginLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+}
+
+// Login form component separated to use client hooks safely
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { status } = useSession();
@@ -57,11 +67,7 @@ export default function LoginPage() {
 
   // If still checking authentication status, show loading
   if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoginLoading />;
   }
 
   return (
@@ -117,5 +123,14 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginForm />
+    </Suspense>
   );
 } 
